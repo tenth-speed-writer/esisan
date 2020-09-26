@@ -11,7 +11,7 @@ THERA = "11000031"
 
 # Thera is small, so it's useful for development--but could also be a cool market candidate for study.
 # Remember, Thera is a perfectly viable market if you're willing to crash a hole camp. :)
-TARGET_MARKET = THERA
+TARGET_MARKET = JITA
 
 market_regions = (JITA, AMARR, RENS, DODIXIE, HEK)
 
@@ -100,3 +100,5 @@ def save_orders(region_id=TARGET_MARKET):
         now = dt.strftime(dt.utcnow(), "%Y-%m-%dT%H:%M:%S%Z")
         print("Update which began at {} has completed at {}".format(live_orders[0]["queried_on"],
                                                                     now))
+
+save_orders(TARGET_MARKET)
