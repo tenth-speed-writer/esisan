@@ -63,3 +63,16 @@ with make_connection() as conn:
     """
     c.execute(sql)
     conn.commit()
+
+# Create a view which appends that useful info
+with make_connection() as conn:
+    c = conn.cursor()
+
+    sql = """CREATE VIEW IF NOT EXISTS named_orders
+             AS
+               SELECT * from ORDERS
+                LEFT JOIN type_ids
+                 ON orders.type_id = type_ids.type_id
+          """
+    c.execute(sql)
+    conn.commit()
