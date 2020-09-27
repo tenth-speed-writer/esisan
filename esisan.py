@@ -54,14 +54,18 @@ def _fetch_page(region_id, now, page=1):
                 return []
             else:
                 # Convert is_buy_order bool to a type string
-                for r in rows:
-                    r["queried_on"] = now
-                    if r["is_buy_order"]:
-                        r["type"] = "buy"
-                    else:
-                        r["type"] = "sell"
-                return rows
-
+                try:
+                    for r in rows:
+                        r["queried_on"] = now
+                        if r["is_buy_order"]:
+                            r["type"] = "buy"
+                        else:
+                            r["type"] = "sell"
+                    return rows
+                except TypeError as err:
+                    logging.error(err)
+                    print("That weird string bug happened. Skipping page.")
+                    return -1
         except JSONDecodeError as err:
             logging.error(err)
             logging.debug("\n\nMessage body reads as:\n" + res.text)
@@ -105,6 +109,7 @@ def _save_page(rows):
 
 
 def update_region(region_id=TARGET_MARKET):
+
     now = dt.strftime(dt.utcnow(), "%Y-%m-%dT%H:%M:%S%Z")
     print("Beginning cache for region " + str(region_id) + " at " + now)
 
@@ -142,6 +147,7 @@ def update_region(region_id=TARGET_MARKET):
 def update_minerals():
     """Updates each mineral in each market region."""
     now = dt.strftime(dt.utcnow(), "%Y-%m-%dT%H:%M:%S%Z")
+    sleep(1)
     for region_id in MARKET_REGIONS:
         for type_id in [m[1] for m in MINERALS]:
             params = {
