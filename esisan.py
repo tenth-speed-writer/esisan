@@ -44,26 +44,31 @@ def _fetch_page(region_id, now, page=1):
     }
 
     # Execute request and parse response to a list of dicts
-    res = rq.get(path, params=params)
     try:
-        rows = res.json()
+        res = rq.get(path, params=params)
+        try:
+            rows = res.json()
 
-        if rows is None:
-            # Get nothing, return nothing--and dodge a bug.
-            return []
-        else:
-            # Convert is_buy_order bool to a type string
-            for r in rows:
-                r["queried_on"] = now
-                if r["is_buy_order"]:
-                    r["type"] = "buy"
-                else:
-                    r["type"] = "sell"
-            return rows
+            if rows is None:
+                # Get nothing, return nothing--and dodge a bug.
+                return []
+            else:
+                # Convert is_buy_order bool to a type string
+                for r in rows:
+                    r["queried_on"] = now
+                    if r["is_buy_order"]:
+                        r["type"] = "buy"
+                    else:
+                        r["type"] = "sell"
+                return rows
 
-    except JSONDecodeError as err:
+        except JSONDecodeError as err:
+            logging.error(err)
+            logging.debug("\n\nMessage body reads as:\n" + res.text)
+            return -1
+    except rq.exceptions.ConnectionError as err:
         logging.error(err)
-        logging.debug("\n\nMessage body reads as:\n" + res.text)
+        print("Skipping iteration - Connection Error")
         return -1
 
 
